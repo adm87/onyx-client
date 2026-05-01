@@ -2,11 +2,9 @@ package game
 
 import (
 	"context"
-	"image/color"
 
 	"github.com/adm87/onyx/pkg/engine"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type onyx struct {
@@ -15,6 +13,7 @@ type onyx struct {
 	assets *engine.Assets
 	input  *engine.Input
 	screen *engine.Screen
+	scenes *engine.Scenes
 }
 
 func newGame(
@@ -23,13 +22,15 @@ func newGame(
 	logger *engine.Logger,
 	input *engine.Input,
 	assets *engine.Assets,
-	screen *engine.Screen) *onyx {
+	screen *engine.Screen,
+	scenes *engine.Scenes) *onyx {
 	return &onyx{
 		ctx:    ctx,
 		logger: logger,
 		assets: assets,
 		input:  input,
 		screen: screen,
+		scenes: scenes,
 	}
 }
 
@@ -39,6 +40,9 @@ func (o *onyx) Update() error {
 		return o.ctx.Err()
 	default:
 		if err := o.input.Poll(); err != nil {
+			return err
+		}
+		if err := o.scenes.Update(); err != nil {
 			return err
 		}
 		return nil
@@ -53,25 +57,9 @@ func (o *onyx) Draw(screen *ebiten.Image) {
 		buffer := o.screen.Buffer()
 		buffer.Clear()
 
-		safeMinX, safeMinY := o.screen.SafeArea().Min()
-		safeMaxX, safeMaxY := o.screen.SafeArea().Max()
-
-		safeMinX += 10
-		safeMinY += 10
-		safeMaxX -= 10
-		safeMaxY -= 10
-
-		// top left
-		vector.FillRect(buffer, float32(safeMinX), float32(safeMinY), 100, 100, color.RGBA{R: 255, G: 0, B: 0, A: 255}, true)
-
-		// top right
-		vector.FillRect(buffer, float32(safeMaxX-100), float32(safeMinY), 100, 100, color.RGBA{R: 0, G: 255, B: 0, A: 255}, true)
-
-		// bottom left
-		vector.FillRect(buffer, float32(safeMinX), float32(safeMaxY-100), 100, 100, color.RGBA{R: 0, G: 0, B: 255, A: 255}, true)
-
-		// bottom right
-		vector.FillRect(buffer, float32(safeMaxX-100), float32(safeMaxY-100), 100, 100, color.RGBA{R: 255, G: 255, B: 0, A: 255}, true)
+		if err := o.scenes.Draw(buffer); err != nil {
+			o.logger.Error("error while drawing: %v", err)
+		}
 
 		screen.DrawImage(buffer, o.screen.Options())
 	}
