@@ -21,14 +21,14 @@ func Boot(cfg *engine.Config) error {
 	assets := createAssets(logger)
 	input := createInput(logger)
 	screen := createScreen(cfg, logger)
-	scenes, id := createScenes(logger, assets, input, screen)
 
+	scenes, id := createScenes(logger, assets, input, screen)
 	if err := scenes.Start(id); err != nil {
 		logger.Error("failed starting initial scene: %v", err)
 		return err
 	}
 
-	onyx := newGame(ctx, cfg, logger, input, assets, screen, scenes)
+	onyx := newGame(ctx, cfg, logger, screen, scenes)
 	if err := engine.Run(cfg, onyx); err != nil {
 		logger.Error("game loop exited with error", "error", err.Error())
 		return err
@@ -76,7 +76,7 @@ func createScenes(logger *engine.Logger, assets *engine.Assets, input *engine.In
 		&engine.SceneEntry{
 			Id: splashscreen.SplashScreenSceneId,
 			Ctor: func() engine.Scene {
-				return splashscreen.New(logger, assets, screen, input)
+				return splashscreen.New(logger, assets, screen)
 			},
 		},
 	)

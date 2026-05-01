@@ -28,10 +28,11 @@ type Screen struct {
 	opts     *ebiten.DrawImageOptions
 	safeArea *SafeArea
 
-	logicalW, logicalH int
-	lastW, lastH       int
-	isDirty            bool
-	scale              float64
+	originalW, originalH int
+	logicalW, logicalH   int
+	lastW, lastH         int
+	isDirty              bool
+	scale                float64
 
 	resizeMode ScreenResizeMode
 }
@@ -43,6 +44,8 @@ func NewScreen(width, height int, filter ebiten.Filter, resizeMode ScreenResizeM
 			Filter: filter,
 		},
 		resizeMode: resizeMode,
+		originalW:  width,
+		originalH:  height,
 		safeArea:   &SafeArea{},
 	}
 }
@@ -61,6 +64,10 @@ func (s *Screen) ResizeBuffer(width, height int) {
 		s.img = ebiten.NewImage(width, height)
 		s.recalculateLayout(s.lastW, s.lastH)
 	}
+}
+
+func (s *Screen) RestoreBuffer() {
+	s.ResizeBuffer(s.originalW, s.originalH)
 }
 
 func (s *Screen) Scale() float64 {

@@ -10,8 +10,6 @@ import (
 type onyx struct {
 	ctx    context.Context
 	logger *engine.Logger
-	assets *engine.Assets
-	input  *engine.Input
 	screen *engine.Screen
 	scenes *engine.Scenes
 }
@@ -20,15 +18,11 @@ func newGame(
 	ctx context.Context,
 	cfg *engine.Config,
 	logger *engine.Logger,
-	input *engine.Input,
-	assets *engine.Assets,
 	screen *engine.Screen,
 	scenes *engine.Scenes) *onyx {
 	return &onyx{
 		ctx:    ctx,
 		logger: logger,
-		assets: assets,
-		input:  input,
 		screen: screen,
 		scenes: scenes,
 	}
@@ -39,13 +33,7 @@ func (o *onyx) Update() error {
 	case <-o.ctx.Done():
 		return o.ctx.Err()
 	default:
-		if err := o.input.Poll(); err != nil {
-			return err
-		}
-		if err := o.scenes.Update(); err != nil {
-			return err
-		}
-		return nil
+		return o.scenes.Update()
 	}
 }
 

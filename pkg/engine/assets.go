@@ -1,5 +1,10 @@
 package engine
 
+import (
+	"fmt"
+	"io/fs"
+)
+
 type AssetAdapterID uint64
 
 type AssetAdapter interface {
@@ -51,6 +56,34 @@ func (s *Assets) RegisterAdapter(adapter AssetAdapter) {
 
 	s.adaptersByID[adapter.ID()] = adapter
 	s.logger.Debug("registered asset adapter", "adapter_id", adapter.ID())
+}
+
+func (s *Assets) Load(filesystem fs.FS, filepaths ...FilePath) error {
+	for _, filepath := range filepaths {
+		ftype := filepath.Type()
+		if ftype.IsEmpty() {
+			return fmt.Errorf("cannot infer asset type from path: %s", filepath)
+		}
+
+		adapter, exists := s.adaptersByType[ftype]
+		if !exists {
+			return fmt.Errorf("unsupported asset type: %s", ftype)
+		}
+
+		data, err := fs.ReadFile(filesystem, filepath.String())
+		if err != nil {
+			return fmt.Errorf("failed to read asset: %w", err)
+		}
+
+		if err := adapter.Import(filepath, data); err != nil {
+			return fmt.Errorf("failed to import asset: %w", err)
+		}
+	}
+	return nil
+}
+
+func (s *Assets) Unload(filepaths ...FilePath) {
+
 }
 
 func (s *Assets) AdapterByType(t FileType) (AssetAdapter, bool) {
