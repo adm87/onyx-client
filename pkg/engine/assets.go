@@ -5,7 +5,7 @@ import (
 	"io/fs"
 )
 
-type AssetAdapterID uint64
+type AssetAdapterID string
 
 type AssetAdapter interface {
 	Import(path FilePath, data []byte) error
@@ -62,21 +62,21 @@ func (s *Assets) Load(filesystem fs.FS, filepaths ...FilePath) error {
 	for _, filepath := range filepaths {
 		ftype := filepath.Type()
 		if ftype.IsEmpty() {
-			return fmt.Errorf("cannot infer asset type from path: %s", filepath)
+			return fmt.Errorf("cannot infer asset type from path", "path", filepath)
 		}
 
 		adapter, exists := s.adaptersByType[ftype]
 		if !exists {
-			return fmt.Errorf("unsupported asset type: %s", ftype)
+			return fmt.Errorf("unsupported asset type", "type", ftype)
 		}
 
 		data, err := fs.ReadFile(filesystem, filepath.String())
 		if err != nil {
-			return fmt.Errorf("failed to read asset: %w", err)
+			return fmt.Errorf("failed to read asset", "error", err)
 		}
 
 		if err := adapter.Import(filepath, data); err != nil {
-			return fmt.Errorf("failed to import asset: %w", err)
+			return fmt.Errorf("failed to import asset", "error", err)
 		}
 	}
 	return nil

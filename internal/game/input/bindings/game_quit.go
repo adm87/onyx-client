@@ -14,7 +14,7 @@ func NewGameQuitBinding() *GameQuitBinding {
 }
 
 func (b *GameQuitBinding) ID() engine.InputBindingID {
-	return QuitBindingID
+	return Quit
 }
 
 func (b *GameQuitBinding) Poll() error {

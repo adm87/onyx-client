@@ -12,7 +12,7 @@ func Cache(assets *engine.Assets) (engine.AssetCache[*ebiten.Image], error) {
 	if !exists {
 		return nil, engine.ErrAssetAdapterNotFound
 	}
-	return adapter.(*EbitenImageAdapter).cache, nil
+	return adapter.(*ImageAssets).cache, nil
 }
 
 type cache struct {

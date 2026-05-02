@@ -28,7 +28,7 @@ func (s *Input) EnableBinding(id InputBindingID) {
 		binding.SetActive(true)
 		return
 	}
-	s.logger.Warn("Attempted to enable non-existent input binding with ID %d", id)
+	s.logger.Warn("Attempted to enable non-existent input binding with ID", "id", id)
 }
 
 func (s *Input) DisableBinding(id InputBindingID) {
@@ -36,7 +36,7 @@ func (s *Input) DisableBinding(id InputBindingID) {
 		binding.SetActive(false)
 		return
 	}
-	s.logger.Warn("Attempted to disable non-existent input binding with ID %d", id)
+	s.logger.Warn("Attempted to disable non-existent input binding with ID", "id", id)
 }
 
 func (s *Input) Poll() error {
@@ -51,7 +51,7 @@ func (s *Input) Poll() error {
 func (s *Input) Bind(bindings ...InputBinding) {
 	for _, binding := range bindings {
 		if _, exists := s.bindings[binding.ID()]; exists {
-			s.logger.Warn("Input binding with ID %d already exists, overwriting", binding.ID())
+			s.logger.Warn("Input binding with ID already exists, overwriting", "id", binding.ID())
 		}
 		s.bindings[binding.ID()] = binding
 		s.logger.Debug("Bound input with ID", "id", binding.ID())

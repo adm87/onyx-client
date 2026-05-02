@@ -14,12 +14,7 @@ type onyx struct {
 	scenes *engine.Scenes
 }
 
-func newGame(
-	ctx context.Context,
-	cfg *engine.Config,
-	logger *engine.Logger,
-	screen *engine.Screen,
-	scenes *engine.Scenes) *onyx {
+func newGame(ctx context.Context, cfg *engine.Config, logger *engine.Logger, screen *engine.Screen, scenes *engine.Scenes) *onyx {
 	return &onyx{
 		ctx:    ctx,
 		logger: logger,
@@ -46,7 +41,7 @@ func (o *onyx) Draw(screen *ebiten.Image) {
 		buffer.Clear()
 
 		if err := o.scenes.Draw(buffer); err != nil {
-			o.logger.Error("error while drawing: %v", err)
+			o.logger.Error("error while drawing", "error", err)
 		}
 
 		screen.DrawImage(buffer, o.screen.Options())

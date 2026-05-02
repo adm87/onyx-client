@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	"github.com/adm87/onyx/internal/game/input/bindings"
+	"github.com/adm87/onyx/internal/game/scenes/gameplay"
 	"github.com/adm87/onyx/internal/game/scenes/splashscreen"
 	"github.com/adm87/onyx/pkg/engine"
 	"github.com/adm87/onyx/pkg/images"
@@ -21,10 +22,11 @@ func Boot(cfg *engine.Config) error {
 	assets := createAssets(logger)
 	input := createInput(logger)
 	screen := createScreen(cfg, logger)
+	renderer := createRenderer(logger)
 
-	scenes, id := createScenes(logger, assets, input, screen)
-	if err := scenes.Start(id); err != nil {
-		logger.Error("failed starting initial scene: %v", err)
+	scenes := createScenes(logger, assets, input, screen, renderer)
+	if err := scenes.Start(engine.SceneId(cfg.InitialScene)); err != nil {
+		logger.Error("failed starting initial scene", "error", err)
 		return err
 	}
 
@@ -64,21 +66,35 @@ func createScreen(cfg *engine.Config, logger *engine.Logger) *engine.Screen {
 	screen := engine.NewScreen(
 		cfg.Width,
 		cfg.Height,
-		ebiten.FilterLinear,
+		ebiten.FilterPixelated,
 		engine.ScreenResizeByHeight,
 	)
 	return screen
 }
 
-func createScenes(logger *engine.Logger, assets *engine.Assets, input *engine.Input, screen *engine.Screen) (*engine.Scenes, engine.SceneID) {
+func createRenderer(logger *engine.Logger) *engine.Renderer {
+	renderer := engine.NewRenderer(logger)
+	return renderer
+}
+
+func createScenes(logger *engine.Logger, assets *engine.Assets, input *engine.Input, screen *engine.Screen, renderer *engine.Renderer) *engine.Scenes {
 	scenes := engine.NewScenes(logger)
-	scenes.AddScenes(
+	scenes.Add(
 		&engine.SceneEntry{
-			Id: splashscreen.SplashScreenSceneId,
+			Id: splashscreen.SceneId,
 			Ctor: func() engine.Scene {
-				return splashscreen.New(logger, assets, screen)
+				return splashscreen.NewScene(logger, assets, screen)
+			},
+			Transitions: map[engine.SceneExitCode]engine.SceneId{
+				splashscreen.Complete: gameplay.SceneId,
+			},
+		},
+		&engine.SceneEntry{
+			Id: gameplay.SceneId,
+			Ctor: func() engine.Scene {
+				return gameplay.NewScene(logger, assets, input, screen)
 			},
 		},
 	)
-	return scenes, splashscreen.SplashScreenSceneId
+	return scenes
 }

@@ -4,17 +4,20 @@ import "flag"
 
 type GameArgs struct {
 	Fullscreen bool
+	Scene      string
 }
 
 func NewGameArgs() *GameArgs {
 	return &GameArgs{
 		Fullscreen: false,
+		Scene:      "",
 	}
 }
 
 func (ga *GameArgs) Parse(prog string, args []string) error {
 	set := flag.NewFlagSet(prog, flag.ContinueOnError)
 	set.BoolVar(&ga.Fullscreen, "fullscreen", ga.Fullscreen, "run the game in fullscreen mode")
+	set.StringVar(&ga.Scene, "scene", ga.Scene, "the initial scene to start the game with")
 
 	if err := set.Parse(args); err != nil {
 		return err

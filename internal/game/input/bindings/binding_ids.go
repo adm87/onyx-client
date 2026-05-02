@@ -6,11 +6,11 @@ import (
 )
 
 const (
-	QuitBindingID engine.InputBindingID = iota
-	FullscreenToggleBindingID
+	Quit engine.InputBindingID = iota
+	Fullscreen
 )
 
 var keyboardBindingTable = map[engine.InputBindingID]ebiten.Key{
-	QuitBindingID:             ebiten.KeyEscape,
-	FullscreenToggleBindingID: ebiten.KeyF11,
+	Quit:       ebiten.KeyEscape,
+	Fullscreen: ebiten.KeyF11,
 }

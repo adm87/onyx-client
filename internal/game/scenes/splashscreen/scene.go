@@ -2,7 +2,6 @@ package splashscreen
 
 import (
 	"github.com/adm87/onyx/internal/content"
-	"github.com/adm87/onyx/pkg/encoding"
 	"github.com/adm87/onyx/pkg/engine"
 	"github.com/adm87/onyx/pkg/images"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -10,18 +9,26 @@ import (
 	"github.com/tanema/gween/ease"
 )
 
-var SplashScreenSceneId = engine.SceneID(encoding.TypeID[Scene]())
+const (
+	Complete engine.SceneExitCode = iota + 1
+)
+
+const (
+	SceneId engine.SceneId = "splash_screen"
+)
 
 type Scene struct {
-	logger  *engine.Logger
-	assets  *engine.Assets
-	screen  *engine.Screen
-	img     *ebiten.Image
-	seq     *gween.Sequence
-	opacity float32
+	logger *engine.Logger
+	assets *engine.Assets
+	screen *engine.Screen
+	img    *ebiten.Image
+	seq    *gween.Sequence
+
+	complete bool
+	opacity  float32
 }
 
-func New(logger *engine.Logger, assets *engine.Assets, screen *engine.Screen) *Scene {
+func NewScene(logger *engine.Logger, assets *engine.Assets, screen *engine.Screen) *Scene {
 	return &Scene{
 		logger: logger,
 		assets: assets,
@@ -55,10 +62,14 @@ func (s *Scene) OnExit() error {
 	return nil
 }
 
-func (s *Scene) Update() error {
-	o, _, _ := s.seq.Update(1.0 / 60.0)
+func (s *Scene) Update() (engine.SceneExitCode, error) {
+	o, _, complete := s.seq.Update(1.0 / 60.0)
 	s.opacity = o
-	return nil
+
+	if complete {
+		return Complete, nil
+	}
+	return engine.SceneExitCodeNone, nil
 }
 
 func (s *Scene) Draw(screen *ebiten.Image) error {

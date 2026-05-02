@@ -15,7 +15,7 @@ func NewFullscreenToggleBinding() *FullscreenToggleBinding {
 }
 
 func (b *FullscreenToggleBinding) ID() engine.InputBindingID {
-	return FullscreenToggleBindingID
+	return Fullscreen
 }
 
 func (b *FullscreenToggleBinding) Poll() error {

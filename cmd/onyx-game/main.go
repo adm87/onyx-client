@@ -19,10 +19,11 @@ func main() {
 		os.Exit(1)
 	}
 	cfg := &engine.Config{
-		Title:      "Onyx Game",
-		Width:      1280,
-		Height:     720,
-		Fullscreen: args.Fullscreen,
+		Title:        "Onyx Game",
+		Width:        1280,
+		Height:       720,
+		Fullscreen:   args.Fullscreen,
+		InitialScene: args.Scene,
 	}
 	if err := game.Boot(cfg); err != nil && !errors.Is(err, context.Canceled) {
 		println("error running game:", err.Error())
