@@ -46,7 +46,7 @@ func (r SceneRouter) GetNext(from SceneId, exitCode SceneExitCode) (SceneId, boo
 type Scene interface {
 	OnEnter() error
 	OnExit() error
-	Update() (SceneExitCode, error)
+	Update(deltaTime, fixedTime float64, steps int) (SceneExitCode, error)
 	Draw(screen *ebiten.Image) error
 }
 
@@ -126,7 +126,7 @@ func (s *Scenes) Exit() error {
 	return nil
 }
 
-func (s *Scenes) Update() error {
+func (s *Scenes) Update(deltaTime, fixedTime float64, steps int) error {
 	if !s.pendingID.IsNone() {
 		if err := s.Start(s.pendingID); err != nil {
 			return fmt.Errorf("failed to start pending scene id=%s error=%w", s.pendingID, err)
@@ -138,7 +138,7 @@ func (s *Scenes) Update() error {
 		return nil
 	}
 
-	exitCode, err := s.current.Update()
+	exitCode, err := s.current.Update(deltaTime, fixedTime, steps)
 	if err != nil {
 		return err
 	}

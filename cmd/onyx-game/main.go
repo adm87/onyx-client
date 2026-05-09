@@ -5,8 +5,8 @@ import (
 	"errors"
 	"os"
 
-	"github.com/adm87/onyx/internal/game"
-	"github.com/adm87/onyx/internal/game/cli"
+	"github.com/adm87/onyx/cmd/onyx-game/internal/game"
+	"github.com/adm87/onyx/cmd/onyx-game/internal/game/cli"
 	"github.com/adm87/onyx/pkg/engine"
 )
 
@@ -22,6 +22,7 @@ func main() {
 		Title:        "Onyx Game",
 		Width:        1280,
 		Height:       720,
+		FPS:          60,
 		Fullscreen:   args.Fullscreen,
 		InitialScene: args.Scene,
 	}

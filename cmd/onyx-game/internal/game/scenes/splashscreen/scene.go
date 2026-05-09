@@ -62,8 +62,8 @@ func (s *Scene) OnExit() error {
 	return nil
 }
 
-func (s *Scene) Update() (engine.SceneExitCode, error) {
-	o, _, complete := s.seq.Update(1.0 / 60.0)
+func (s *Scene) Update(deltaTime, fixedTime float64, steps int) (engine.SceneExitCode, error) {
+	o, _, complete := s.seq.Update(float32(deltaTime))
 	s.opacity = o
 
 	if complete {

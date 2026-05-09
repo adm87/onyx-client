@@ -1,6 +1,10 @@
 package cli
 
-import "flag"
+import (
+	"flag"
+
+	"github.com/adm87/onyx/cmd/onyx-game/internal/game/scenes/splashscreen"
+)
 
 type GameArgs struct {
 	Fullscreen bool
@@ -10,7 +14,7 @@ type GameArgs struct {
 func NewGameArgs() *GameArgs {
 	return &GameArgs{
 		Fullscreen: false,
-		Scene:      "",
+		Scene:      string(splashscreen.SceneId),
 	}
 }
 

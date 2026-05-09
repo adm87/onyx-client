@@ -12,14 +12,17 @@ type onyx struct {
 	logger *engine.Logger
 	screen *engine.Screen
 	scenes *engine.Scenes
+	time   *engine.Time
 }
 
 func newGame(ctx context.Context, cfg *engine.Config, logger *engine.Logger, screen *engine.Screen, scenes *engine.Scenes) *onyx {
+	time := engine.NewTime(cfg.FPS)
 	return &onyx{
 		ctx:    ctx,
 		logger: logger,
 		screen: screen,
 		scenes: scenes,
+		time:   time,
 	}
 }
 
@@ -28,7 +31,8 @@ func (o *onyx) Update() error {
 	case <-o.ctx.Done():
 		return o.ctx.Err()
 	default:
-		return o.scenes.Update()
+		o.time.Update()
+		return o.scenes.Update(o.time.DeltaTime(), o.time.FixedTime(), o.time.Steps())
 	}
 }
 

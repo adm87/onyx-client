@@ -1,7 +1,7 @@
 package gameplay
 
 import (
-	"github.com/adm87/onyx/internal/game/input/bindings"
+	"github.com/adm87/onyx/cmd/onyx-game/internal/game/input/bindings"
 	"github.com/adm87/onyx/pkg/engine"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -12,10 +12,11 @@ const (
 )
 
 type Scene struct {
-	logger *engine.Logger
-	assets *engine.Assets
-	input  *engine.Input
-	screen *engine.Screen
+	logger    *engine.Logger
+	assets    *engine.Assets
+	input     *engine.Input
+	screen    *engine.Screen
+	schedular *schedular
 }
 
 func NewScene(logger *engine.Logger, assets *engine.Assets, input *engine.Input, screen *engine.Screen) *Scene {
@@ -39,8 +40,11 @@ func (s *Scene) OnExit() error {
 	return nil
 }
 
-func (s *Scene) Update() (engine.SceneExitCode, error) {
+func (s *Scene) Update(deltaTime, fixedTime float64, steps int) (engine.SceneExitCode, error) {
 	if err := s.input.Poll(); err != nil {
+		return engine.SceneExitCodeNone, err
+	}
+	if err := s.schedular.Update(); err != nil {
 		return engine.SceneExitCodeNone, err
 	}
 	return engine.SceneExitCodeNone, nil
