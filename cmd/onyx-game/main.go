@@ -22,7 +22,7 @@ func main() {
 		Title:        "Onyx Game",
 		Width:        1280,
 		Height:       720,
-		FPS:          60,
+		FPS:          1,
 		Fullscreen:   args.Fullscreen,
 		InitialScene: args.Scene,
 	}

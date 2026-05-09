@@ -6,44 +6,40 @@ import (
 	"github.com/yohamta/donburi/filter"
 )
 
-// OnSynced is an event that is published after the SyncTransformSystem has updated the transformation matrices of all entities.
-// The event carries a slice of entries that were synced, allowing other systems to react to the changes.
-//
-// Note: The slice of entries is only valid during the event callback and should not be stored or used after the callback returns, as it may be reused in subsequent updates.
-var OnSynced = events.NewEventType[[]*donburi.Entry]()
-
-type SyncTransformSystem struct {
+type TransformSyncSystem struct {
 	query  *donburi.Query
 	synced []*donburi.Entry
+
+	OnSynced *events.EventType[[]*donburi.Entry]
 }
 
-func NewSyncTransformSystem() *SyncTransformSystem {
-	return &SyncTransformSystem{
+func NewTransformSyncSystem() *TransformSyncSystem {
+	return &TransformSyncSystem{
 		query: donburi.NewQuery(
-			filter.Contains(Archetype()...),
+			filter.Contains(Transform),
 		),
-		synced: make([]*donburi.Entry, 0, 128),
+		synced:   make([]*donburi.Entry, 0, 128),
+		OnSynced: events.NewEventType[[]*donburi.Entry](),
 	}
 }
 
-func (s *SyncTransformSystem) Update(world donburi.World) {
+func (s *TransformSyncSystem) Update(world donburi.World) {
 	s.synced = s.synced[:0] // Clear the synced slice
 	s.query.Each(world, func(entry *donburi.Entry) {
-		m := GetMatrix(entry)
-
-		if !m.isDirty {
+		t := GetTransform(entry)
+		if !t.isDirty {
 			return
 		}
+		t.isDirty = false
 
-		t := GetTransform(entry)
+		m := GetGeoM(entry)
+		m.Reset()
+		m.Scale(t.scale.X, t.scale.Y)
+		m.Rotate(t.rotation)
+		m.Translate(t.position.X, t.position.Y)
+		matrix.Set(entry, m)
 
-		m.Matrix.Reset()
-		m.Matrix.Scale(t.Scale.X, t.Scale.Y)
-		m.Matrix.Rotate(t.Rotation)
-		m.Matrix.Translate(t.Position.X, t.Position.Y)
-
-		m.isDirty = false
 		s.synced = append(s.synced, entry)
 	})
-	OnSynced.Publish(world, s.synced)
+	// s.OnSynced.Publish(world, s.synced)
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/adm87/onyx/cmd/onyx-game/internal/game/input/bindings"
 	"github.com/adm87/onyx/cmd/onyx-game/internal/game/scenes/gameplay"
 	"github.com/adm87/onyx/cmd/onyx-game/internal/game/scenes/splashscreen"
+	"github.com/adm87/onyx/internal/content"
 	"github.com/adm87/onyx/pkg/engine"
 	"github.com/adm87/onyx/pkg/images"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -23,10 +24,10 @@ func Boot(cfg *engine.Config) error {
 	input := createInput(logger)
 	screen := createScreen(cfg, logger)
 	renderer := createRenderer(logger)
-
 	scenes := createScenes(logger, assets, input, screen, renderer)
-	if err := scenes.Start(engine.SceneId(cfg.InitialScene)); err != nil {
-		logger.Error("failed starting initial scene", "error", err)
+
+	if err := LoadDefaultAssets(ctx, assets); err != nil {
+		logger.Error("failed to load default assets", "error", err)
 		return err
 	}
 
@@ -97,4 +98,9 @@ func createScenes(logger *engine.Logger, assets *engine.Assets, input *engine.In
 		},
 	)
 	return scenes
+}
+
+func LoadDefaultAssets(ctx context.Context, assets *engine.Assets) error {
+	return assets.Load(content.StaticAssetFS,
+		content.StatisImg10x10FilePath)
 }

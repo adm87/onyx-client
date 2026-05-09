@@ -8,21 +8,27 @@ import (
 )
 
 type onyx struct {
-	ctx    context.Context
+	ctx context.Context
+
+	cfg    *engine.Config
 	logger *engine.Logger
 	screen *engine.Screen
 	scenes *engine.Scenes
 	time   *engine.Time
+
+	firstUpdate bool
 }
 
 func newGame(ctx context.Context, cfg *engine.Config, logger *engine.Logger, screen *engine.Screen, scenes *engine.Scenes) *onyx {
 	time := engine.NewTime(cfg.FPS)
 	return &onyx{
-		ctx:    ctx,
-		logger: logger,
-		screen: screen,
-		scenes: scenes,
-		time:   time,
+		ctx:         ctx,
+		cfg:         cfg,
+		logger:      logger,
+		screen:      screen,
+		scenes:      scenes,
+		time:        time,
+		firstUpdate: true,
 	}
 }
 
@@ -32,6 +38,13 @@ func (o *onyx) Update() error {
 		return o.ctx.Err()
 	default:
 		o.time.Update()
+		if o.firstUpdate {
+			if err := o.scenes.Start(engine.SceneId(o.cfg.InitialScene)); err != nil {
+				o.logger.Error("failed to start initial scene", "scene", o.cfg.InitialScene, "error", err)
+				return err
+			}
+			o.firstUpdate = false
+		}
 		return o.scenes.Update(o.time.DeltaTime(), o.time.FixedTime(), o.time.Steps())
 	}
 }

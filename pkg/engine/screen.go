@@ -78,6 +78,14 @@ func (s *Screen) SafeArea() *SafeArea {
 	return s.safeArea
 }
 
+func (s *Screen) Min() (float64, float64) {
+	return 0, 0
+}
+
+func (s *Screen) Max() (float64, float64) {
+	return float64(s.img.Bounds().Dx()), float64(s.img.Bounds().Dy())
+}
+
 func (s *Screen) Layout(outsideWidth, outsideHeight int) (int, int) {
 	if outsideWidth == s.logicalW && outsideHeight == s.logicalH && !s.isDirty {
 		return s.logicalW, s.logicalH

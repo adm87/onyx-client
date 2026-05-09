@@ -7,74 +7,76 @@ import (
 )
 
 type (
-	TransformModel struct {
-		Position geom.Vec2
-		Rotation float64
-		Scale    geom.Vec2
-	}
-	MatrixModel struct {
-		Matrix  ebiten.GeoM
-		isDirty bool
+	TransformData struct {
+		position geom.Vec2
+		rotation float64
+		scale    geom.Vec2
+		isDirty  bool
 	}
 )
 
 var (
-	Transform = donburi.NewComponentType[TransformModel](TransformModel{
-		Scale: geom.OneVec2(),
-	})
-	Matrix = donburi.NewComponentType[MatrixModel](MatrixModel{
+	Transform = donburi.NewComponentType[TransformData](TransformData{
+		scale:   geom.OneVec2(),
 		isDirty: true,
 	})
+	matrix = donburi.NewComponentType[ebiten.GeoM]()
 )
 
-// Archetype returns the list of components that make up a common Transform archetype.
-func Archetype() []donburi.IComponentType {
-	return []donburi.IComponentType{
-		Transform,
-		Matrix,
-	}
-}
-
-func GetTransform(entry *donburi.Entry) *TransformModel {
+func GetTransform(entry *donburi.Entry) *TransformData {
 	if !entry.HasComponent(Transform) {
 		panic("entry does not have Transform component")
 	}
-	return donburi.Get[TransformModel](entry, Transform)
+	return donburi.Get[TransformData](entry, Transform)
 }
 
-func GetMatrix(entry *donburi.Entry) *MatrixModel {
-	if !entry.HasComponent(Matrix) {
-		panic("entry does not have Matrix component")
+func GetGeoM(entry *donburi.Entry) *ebiten.GeoM {
+	if !entry.HasComponent(matrix) {
+		entry.AddComponent(matrix)
 	}
-	return donburi.Get[MatrixModel](entry, Matrix)
+	return matrix.Get(entry)
 }
 
 func GetPosition(entry *donburi.Entry) geom.Vec2 {
-	return GetTransform(entry).Position
+	return GetTransform(entry).position
 }
 
 func GetRotation(entry *donburi.Entry) float64 {
-	return GetTransform(entry).Rotation
+	return GetTransform(entry).rotation
 }
 
 func GetScale(entry *donburi.Entry) geom.Vec2 {
-	return GetTransform(entry).Scale
+	return GetTransform(entry).scale
 }
 
 func SetPosition(entry *donburi.Entry, position geom.Vec2) {
 	t := GetTransform(entry)
-	t.Position = position
-	GetMatrix(entry).isDirty = true
+	t.position = position
+	t.isDirty = true
+}
+
+func SetPositionXY(entry *donburi.Entry, x, y float64) {
+	t := GetTransform(entry)
+	t.position.X = x
+	t.position.Y = y
+	t.isDirty = true
 }
 
 func SetRotation(entry *donburi.Entry, rotation float64) {
 	t := GetTransform(entry)
-	t.Rotation = rotation
-	GetMatrix(entry).isDirty = true
+	t.rotation = rotation
+	t.isDirty = true
 }
 
 func SetScale(entry *donburi.Entry, scale geom.Vec2) {
 	t := GetTransform(entry)
-	t.Scale = scale
-	GetMatrix(entry).isDirty = true
+	t.scale = scale
+	t.isDirty = true
+}
+
+func SetScaleXY(entry *donburi.Entry, x, y float64) {
+	t := GetTransform(entry)
+	t.scale.X = x
+	t.scale.Y = y
+	t.isDirty = true
 }
