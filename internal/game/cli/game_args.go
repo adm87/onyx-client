@@ -3,7 +3,7 @@ package cli
 import (
 	"flag"
 
-	"github.com/adm87/onyx/cmd/onyx-game/internal/game/scenes/splashscreen"
+	"github.com/adm87/onyx/internal/game/scenes/splashscreen"
 )
 
 type GameArgs struct {

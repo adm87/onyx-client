@@ -5,8 +5,8 @@ import (
 	"errors"
 	"os"
 
-	"github.com/adm87/onyx/cmd/onyx-game/internal/game"
-	"github.com/adm87/onyx/cmd/onyx-game/internal/game/cli"
+	"github.com/adm87/onyx/internal/game"
+	"github.com/adm87/onyx/internal/game/cli"
 	"github.com/adm87/onyx/pkg/engine"
 )
 

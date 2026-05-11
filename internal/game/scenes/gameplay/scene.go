@@ -1,9 +1,9 @@
 package gameplay
 
 import (
-	"github.com/adm87/onyx/cmd/onyx-game/internal/game/input/bindings"
 	"github.com/adm87/onyx/internal/content"
 	"github.com/adm87/onyx/internal/ecs/transform"
+	"github.com/adm87/onyx/internal/game/input/bindings"
 	"github.com/adm87/onyx/pkg/engine"
 	"github.com/adm87/onyx/pkg/images"
 	"github.com/hajimehoshi/ebiten/v2"
